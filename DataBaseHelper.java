@@ -7,10 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.strictmode.SqliteObjectLeakedViolation;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
+    String date;
     private static final String DB_NAME = "Historique.db";
     private static final String DB_TABLE = "Historique_Table";
 
@@ -70,6 +73,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query,null);
 
         return cursor;
+    }
+
+    public void delete()
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(calendar.DATE, 2);
+        date = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = " SELECT * FROM " + DB_TABLE;
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext())
+        {
+            if (cursor.getString(0) == date)
+            {
+                db.execSQL(" DELETE FROM " + DB_TABLE);
+                db.delete(DB_TABLE, " DATE = ? ",new String[] {date});
+            }
+        }
+        db.close();
     }
 
 }
