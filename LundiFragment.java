@@ -292,6 +292,12 @@ public class LundiFragment extends Fragment {
                if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_TEXT)
                {
                    muscle = ((EditText) Child).getText().toString();
+                   if (muscle.equalsIgnoreCase(""))
+                   {
+                       muscle = null;
+                       db.deleteAll();
+                       Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                   }
                    compteur++;
                    index++;
                    Child = gl_sceance.getChildAt(index);
@@ -335,7 +341,7 @@ public class LundiFragment extends Fragment {
                }
                else
                {
-                   muscle = null;
+                   muscle = "";
                    poids = null;
                    rep = null;
                    if (Child instanceof  EditText)
@@ -377,10 +383,6 @@ public class LundiFragment extends Fragment {
                     System.out.println("Ajout");
                     db.insertData(date,nomSceance,muscle,poids,rep);
 
-                }
-                else
-                {
-                    clean = false;
                 }
 
             }
