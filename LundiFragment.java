@@ -8,11 +8,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +34,7 @@ public class LundiFragment extends Fragment {
     int nombreWidget = 5;
     int checkExercice = 0;
     int clickTerminer = 0;
+    int temp = 0;
 
 
     //Variable Ajout d'exercice
@@ -43,6 +46,7 @@ public class LundiFragment extends Fragment {
     String stringPoids, stringRep;
     int compteur;
     int index = 3;
+    int checkWidget;
 
 
     //Variable Date
@@ -54,13 +58,14 @@ public class LundiFragment extends Fragment {
 
     //Variable Base de donnée
     ////////////////////////////
+    boolean clean = true;
     boolean dateIdentique;
     String nomSceance;
     ArrayList<String> list_Date;
     String check = "";
     DataBaseHelper db;
     String muscle;
-    int poids, rep;
+    Integer poids, rep;
 
 
     @Nullable
@@ -114,6 +119,7 @@ public class LundiFragment extends Fragment {
                 TerminerSceance();
             }
         });
+
 
 
         return view;
@@ -264,163 +270,131 @@ public class LundiFragment extends Fragment {
     }
 
     public void TerminerSceance() {
+        nomSceance = "";
+        nomSceance = et_nomSceance.getText().toString();
+        db = new DataBaseHelper(getContext());
         dateIdentique = false;
         calendar = Calendar.getInstance();
-        calendar.add(calendar.DATE, 1);
         date = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
+        System.out.println("click");
+        compteur = 0;
+        index = 3;
 
-        if (clickTerminer <= 0)
+        while (compteur < nombreWidget - 5)
         {
-            VerifierDate();
-        }
-        if (dateIdentique == false)
-        {
-            clickTerminer++;
-            nomSceance = et_nomSceance.getText().toString();
 
-            if (!nomSceance.equals(""))
+            Object Child = gl_sceance.getChildAt(index);
+            if ( Child instanceof EditText)
             {
+                muscle = null;
+                poids = null;
+                rep = null;
+               if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_TEXT)
+               {
+                   muscle = ((EditText) Child).getText().toString();
+                   compteur++;
+                   index++;
+                   Child = gl_sceance.getChildAt(index);
 
-                if (gl_sceance.getRowCount() != 2)
-                {
-                    compteur = nombreWidget - 5;
+                   if (Child instanceof  EditText)
+                   {
+                       if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
+                       {
+                           try {
+                               poids = Integer.parseInt(((EditText) Child).getText().toString());
+                           } catch (NumberFormatException e) {
+                               poids = null;
+                               db.deleteAll();
+                               Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
 
-                    while (compteur > 0)
-                    {
-                        Object childMuscle = gl_sceance.getChildAt(index);
+                           }
+                           compteur++;
+                           index++;
+                           Child = gl_sceance.getChildAt(index);
 
-                        if (childMuscle instanceof  EditText)
-                        {
-                            if (((EditText) childMuscle).getInputType() == InputType.TYPE_CLASS_TEXT)
-                            {
-                               muscle =((EditText) childMuscle).getText().toString();
-
-                               if (!muscle.equals(""))
+                           if ( Child instanceof  EditText)
+                           {
+                               if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
                                {
-                                   index++;
-                                   Object childPoids = gl_sceance.getChildAt(index);
-
-                                   if (childPoids instanceof EditText)
-                                   {
-                                       if (((EditText) childPoids).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                                       {
-                                           stringPoids = ((EditText) childPoids).getText().toString();
-                                           if (!stringPoids.equals(""))
-                                           {
-                                               poids = Integer.parseInt(stringPoids);
-
-                                               index++;
-                                               Object childRep = gl_sceance.getChildAt(index);
-
-                                               if (childRep instanceof EditText)
-                                               {
-                                                   if (((EditText) childRep).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                                                   {
-                                                       stringRep = ((EditText) childRep).getText().toString();
-                                                       if (!stringRep.equals(""))
-                                                       {
-                                                           rep = Integer.parseInt(stringRep);
-                                                           db.insertData(date,nomSceance,muscle,poids,rep);
-                                                           checkExercice = checkExercice + 3;
-                                                           index++;
-                                                       }
-                                                       else
-                                                       {
-                                                           Toast.makeText(getContext(), "Veuillez oompléter les champs vides", Toast.LENGTH_SHORT).show();
-                                                       }
-                                                   }
-                                               }
-                                           }
-                                           else
-                                           {
-                                               Toast.makeText(getContext(), "Veuillez oompléter les champs vides", Toast.LENGTH_SHORT).show();
-                                           }
-
-                                       }
-
+                                   try {
+                                       rep = Integer.parseInt(((EditText) Child).getText().toString());
+                                   } catch (NumberFormatException e) {
+                                       rep = null;
+                                       db.deleteAll();
+                                       Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
                                    }
+                                   compteur++;
+                                   index++;
+
                                }
-                               else
+                           }
+                       }
+                   }
+
+
+               }
+               else
+               {
+                   muscle = null;
+                   poids = null;
+                   rep = null;
+                   if (Child instanceof  EditText)
+                   {
+                       if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
+                       {
+                           try {
+                               poids = Integer.parseInt(((EditText) Child).getText().toString());
+                           } catch (NumberFormatException e ) {
+                               poids = null;
+                               db.deleteAll();
+                               Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                           }
+                           compteur++;
+                           index++;
+                           Child = gl_sceance.getChildAt(index);
+
+                           if ( Child instanceof  EditText)
+                           {
+                               if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
                                {
-                                   Toast.makeText(getContext(), "Veuillez oompléter les champs vides", Toast.LENGTH_SHORT).show();
+                                   try {
+                                       rep = Integer.parseInt(((EditText) Child).getText().toString());
+                                   } catch (NumberFormatException e) {
+                                       rep = null;
+                                       db.deleteAll();
+                                       Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                                   }
+                                   compteur++;
+                                   index++;
 
                                }
+                           }
+                       }
+                   }
+               }
+                if (nomSceance != null && muscle != null && poids != null && rep != null)
+                {
+                    System.out.println("Ajout");
+                    db.insertData(date,nomSceance,muscle,poids,rep);
 
-                            }
-                            else
-                            {
-                                Object childPoids = gl_sceance.getChildAt(index);
-                                if (childPoids instanceof EditText)
-                                {
-                                    if (((EditText) childPoids).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                                    {
-                                        stringPoids = ((EditText) childPoids).getText().toString();
-
-                                        if(!stringPoids.equals(""))
-                                        {
-                                            poids = Integer.parseInt(stringPoids);
-                                            index++;
-                                            Object childRep = gl_sceance.getChildAt(index);
-                                            if (childRep instanceof  EditText)
-                                            {
-                                                if(((EditText) childRep).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                                                {
-                                                    stringRep = ((EditText) childRep).getText().toString();
-
-                                                    if(!stringRep.equals(""))
-                                                    {
-                                                        rep = Integer.parseInt(stringRep);
-                                                        db.insertData(date,nomSceance,muscle,poids,rep);
-                                                        checkExercice = checkExercice + 2;
-                                                        index++;
-                                                    }
-                                                    else
-                                                    {
-                                                        Toast.makeText(getContext(), "Veuillez oompléter les champs vides", Toast.LENGTH_SHORT).show();
-
-                                                    }
-                                                }
-                                            }
-
-                                        }
-                                        else
-                                        {
-                                            Toast.makeText(getContext(), "Veuillez oompléter les champs vides", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-
-                        compteur--;
-
-                    }
                 }
                 else
                 {
-                    Toast.makeText(getContext(), "Vous devez enregistrez un exercice", Toast.LENGTH_SHORT).show();
-
+                    clean = false;
                 }
 
             }
-            else
-            {
-                Toast.makeText(getContext(), "Vous devez complétez l'enregistrement de la scéance", Toast.LENGTH_SHORT).show();
-            }
+            //System.out.println(compteur);
+            //System.out.println(muscle + " " + poids + " " + rep);
 
-        }
-        else
-        {
-            Toast.makeText(getContext(), "Vous ne pouvez pas enregistrer un entrainement le même jour", Toast.LENGTH_SHORT).show();
+
 
         }
 
-        if (checkExercice == nombreWidget)
-        {
-            Toast.makeText(getContext(), "Scéance enregistrée", Toast.LENGTH_SHORT).show();
 
-        }
+
+
+
     }
 
     public void VerifierDate()
@@ -430,13 +404,13 @@ public class LundiFragment extends Fragment {
 
         if (cursor.getCount() != 0)
         {
-           while(cursor.moveToNext())
-           {
-               if (date.equals(cursor.getString(0)))
-               {
-                   dateIdentique = true;
-               }
-           }
+            while(cursor.moveToNext())
+            {
+                if (date.equals(cursor.getString(0)))
+                {
+                    dateIdentique = true;
+                }
+            }
 
         }
 
@@ -448,9 +422,3 @@ public class LundiFragment extends Fragment {
     }
 
 }
-
-
-
-
-
-
