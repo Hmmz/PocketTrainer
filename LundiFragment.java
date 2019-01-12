@@ -46,7 +46,7 @@ public class LundiFragment extends Fragment {
     String stringPoids, stringRep;
     int compteur;
     int index = 3;
-    int checkWidget;
+    int checkWidget, checkWidgetTotal;
 
 
     //Variable Date
@@ -270,6 +270,8 @@ public class LundiFragment extends Fragment {
     }
 
     public void TerminerSceance() {
+        checkWidgetTotal = 0;
+        checkWidget = 0;
         nomSceance = "";
         nomSceance = et_nomSceance.getText().toString();
         db = new DataBaseHelper(getContext());
@@ -289,100 +291,122 @@ public class LundiFragment extends Fragment {
                 muscle = null;
                 poids = null;
                 rep = null;
-               if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_TEXT)
-               {
-                   muscle = ((EditText) Child).getText().toString();
-                   if (muscle.equalsIgnoreCase(""))
-                   {
-                       muscle = null;
-                       db.deleteAll();
-                       Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
-                   }
-                   compteur++;
-                   index++;
-                   Child = gl_sceance.getChildAt(index);
-
-                   if (Child instanceof  EditText)
-                   {
-                       if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                       {
-                           try {
-                               poids = Integer.parseInt(((EditText) Child).getText().toString());
-                           } catch (NumberFormatException e) {
-                               poids = null;
-                               db.deleteAll();
-                               Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
-
-                           }
-                           compteur++;
-                           index++;
-                           Child = gl_sceance.getChildAt(index);
-
-                           if ( Child instanceof  EditText)
-                           {
-                               if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                               {
-                                   try {
-                                       rep = Integer.parseInt(((EditText) Child).getText().toString());
-                                   } catch (NumberFormatException e) {
-                                       rep = null;
-                                       db.deleteAll();
-                                       Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
-                                   }
-                                   compteur++;
-                                   index++;
-
-                               }
-                           }
-                       }
-                   }
-
-
-               }
-               else
-               {
-                   muscle = "";
-                   poids = null;
-                   rep = null;
-                   if (Child instanceof  EditText)
-                   {
-                       if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                       {
-                           try {
-                               poids = Integer.parseInt(((EditText) Child).getText().toString());
-                           } catch (NumberFormatException e ) {
-                               poids = null;
-                               db.deleteAll();
-                               Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
-                           }
-                           compteur++;
-                           index++;
-                           Child = gl_sceance.getChildAt(index);
-
-                           if ( Child instanceof  EditText)
-                           {
-                               if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                               {
-                                   try {
-                                       rep = Integer.parseInt(((EditText) Child).getText().toString());
-                                   } catch (NumberFormatException e) {
-                                       rep = null;
-                                       db.deleteAll();
-                                       Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
-                                   }
-                                   compteur++;
-                                   index++;
-
-                               }
-                           }
-                       }
-                   }
-               }
-                if (nomSceance != null && muscle != null && poids != null && rep != null)
+                if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_TEXT)
                 {
+                    muscle = ((EditText) Child).getText().toString();
+                    if (muscle.equalsIgnoreCase(""))
+                    {
+                        muscle = null;
+                        db.delete();
+                        checkWidget--;
+                        Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                    }
+                    checkWidget++;
+                    compteur++;
+                    index++;
+                    Child = gl_sceance.getChildAt(index);
+
+                    if (Child instanceof  EditText)
+                    {
+                        if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
+                        {
+                            try {
+                                poids = Integer.parseInt(((EditText) Child).getText().toString());
+                            } catch (NumberFormatException e) {
+                                poids = null;
+                                db.delete();
+                                checkWidget--;
+                                Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+
+                            }
+                            checkWidget++;
+                            compteur++;
+                            index++;
+                            Child = gl_sceance.getChildAt(index);
+
+                            if ( Child instanceof  EditText)
+                            {
+                                if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
+                                {
+                                    try {
+                                        rep = Integer.parseInt(((EditText) Child).getText().toString());
+                                    } catch (NumberFormatException e) {
+                                        rep = null;
+                                        db.delete();
+                                        checkWidget--;
+                                        Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                                    }
+                                    checkWidget++;
+                                    compteur++;
+                                    index++;
+
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+                else
+                {
+                    muscle = "";
+                    poids = null;
+                    rep = null;
+                    if (Child instanceof  EditText)
+                    {
+                        if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
+                        {
+                            try {
+                                poids = Integer.parseInt(((EditText) Child).getText().toString());
+                            } catch (NumberFormatException e ) {
+                                poids = null;
+                                db.delete();
+                                checkWidget--;
+                                Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                            }
+                            checkWidget++;
+                            compteur++;
+                            index++;
+                            Child = gl_sceance.getChildAt(index);
+
+                            if ( Child instanceof  EditText)
+                            {
+                                if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
+                                {
+                                    try {
+                                        rep = Integer.parseInt(((EditText) Child).getText().toString());
+                                    } catch (NumberFormatException e) {
+                                        rep = null;
+                                        db.delete();
+                                        checkWidget--;
+                                        Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                                    }
+                                    checkWidget++;
+                                    compteur++;
+                                    index++;
+
+                                }
+                            }
+                        }
+                    }
+                }
+                checkWidgetTotal = checkWidgetTotal + checkWidget;
+                if (nomSceance != null && muscle != null && poids != null && rep != null && checkWidgetTotal >= (nombreWidget -5))
+                {
+                    System.out.println("Nombre de wigdet : " + (nombreWidget - 5));
+                    System.out.println("Widget validé : " + checkWidget);
+                    System.out.println("Widget total validé : " + checkWidgetTotal);
                     System.out.println("Ajout");
                     db.insertData(date,nomSceance,muscle,poids,rep);
 
+                }
+                else
+                {
+                    System.out.println("Wigdet : " + (nombreWidget - 5));
+                    System.out.println("Widget validé : " + checkWidget);
+                    System.out.println("Non");
+                    System.out.println("Widget total validé : " + checkWidgetTotal);
+                    checkWidget = 0;
                 }
 
             }
