@@ -58,8 +58,8 @@ public class LundiFragment extends Fragment {
 
     //Variable Base de donnée
     ////////////////////////////
-    boolean clean = true;
     boolean dateIdentique;
+    boolean elementManquant;
     String nomSceance;
     ArrayList<String> list_Date;
     String check = "";
@@ -277,12 +277,14 @@ public class LundiFragment extends Fragment {
         db = new DataBaseHelper(getContext());
         dateIdentique = false;
         calendar = Calendar.getInstance();
+        calendar.add(calendar.DATE,2);
         date = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
         System.out.println("click");
         compteur = 0;
         index = 3;
+        elementManquant = false;
 
-        while (compteur < nombreWidget - 5)
+        while (compteur < nombreWidget - 5 && elementManquant == false)
         {
 
             Object Child = gl_sceance.getChildAt(index);
@@ -298,7 +300,7 @@ public class LundiFragment extends Fragment {
                     {
                         muscle = null;
                         db.delete();
-                        checkWidget--;
+                        elementManquant = true;
                         Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
                     }
                     checkWidget++;
@@ -315,7 +317,7 @@ public class LundiFragment extends Fragment {
                             } catch (NumberFormatException e) {
                                 poids = null;
                                 db.delete();
-                                checkWidget--;
+                                elementManquant = true;
                                 Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
 
                             }
@@ -333,7 +335,7 @@ public class LundiFragment extends Fragment {
                                     } catch (NumberFormatException e) {
                                         rep = null;
                                         db.delete();
-                                        checkWidget--;
+                                        elementManquant = true;
                                         Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
                                     }
                                     checkWidget++;
@@ -349,78 +351,56 @@ public class LundiFragment extends Fragment {
                 }
                 else
                 {
-                    muscle = "";
-                    poids = null;
-                    rep = null;
-                    if (Child instanceof  EditText)
+                muscle = "";
+                poids = null;
+                rep = null;
+                if (Child instanceof  EditText)
+                {
+                    if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
                     {
-                        if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
+                        try {
+                            poids = Integer.parseInt(((EditText) Child).getText().toString());
+                        } catch (NumberFormatException e ) {
+                            poids = null;
+                            db.delete();
+                            elementManquant = true;
+                            Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
+                        }
+                        checkWidget++;
+                        compteur++;
+                        index++;
+                        Child = gl_sceance.getChildAt(index);
+
+                        if ( Child instanceof  EditText)
                         {
-                            try {
-                                poids = Integer.parseInt(((EditText) Child).getText().toString());
-                            } catch (NumberFormatException e ) {
-                                poids = null;
-                                db.delete();
-                                checkWidget--;
-                                Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
-                            }
-                            checkWidget++;
-                            compteur++;
-                            index++;
-                            Child = gl_sceance.getChildAt(index);
-
-                            if ( Child instanceof  EditText)
+                            if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
                             {
-                                if (((EditText) Child).getInputType() == InputType.TYPE_CLASS_NUMBER)
-                                {
-                                    try {
-                                        rep = Integer.parseInt(((EditText) Child).getText().toString());
-                                    } catch (NumberFormatException e) {
-                                        rep = null;
-                                        db.delete();
-                                        checkWidget--;
-                                        Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
-                                    }
-                                    checkWidget++;
-                                    compteur++;
-                                    index++;
-
+                                try {
+                                    rep = Integer.parseInt(((EditText) Child).getText().toString());
+                                } catch (NumberFormatException e) {
+                                    rep = null;
+                                    db.delete();
+                                    elementManquant = true;
+                                    Toast.makeText(getContext(), "Veuillez complétez les champs vides", Toast.LENGTH_SHORT).show();
                                 }
+                                checkWidget++;
+                                compteur++;
+                                index++;
+
                             }
                         }
                     }
                 }
-                checkWidgetTotal = checkWidgetTotal + checkWidget;
-                if (nomSceance != null && muscle != null && poids != null && rep != null && checkWidgetTotal >= (nombreWidget -5))
-                {
-                    System.out.println("Nombre de wigdet : " + (nombreWidget - 5));
-                    System.out.println("Widget validé : " + checkWidget);
-                    System.out.println("Widget total validé : " + checkWidgetTotal);
-                    System.out.println("Ajout");
-                    db.insertData(date,nomSceance,muscle,poids,rep);
-
-                }
-                else
-                {
-                    System.out.println("Wigdet : " + (nombreWidget - 5));
-                    System.out.println("Widget validé : " + checkWidget);
-                    System.out.println("Non");
-                    System.out.println("Widget total validé : " + checkWidgetTotal);
-                    checkWidget = 0;
-                }
-
             }
-            //System.out.println(compteur);
-            //System.out.println(muscle + " " + poids + " " + rep);
-
-
+                checkWidgetTotal = checkWidgetTotal + checkWidget;
+                if (nomSceance != null && muscle != null && poids != null && rep != null && elementManquant == false)
+                {
+                    Toast.makeText(getContext(), "Scéance enregistrée", Toast.LENGTH_SHORT).show();
+                    db.insertData(date,nomSceance,muscle,poids,rep);
+                }
+            }
 
         }
-
-
-
-
-
     }
 
     public void VerifierDate()
@@ -439,11 +419,6 @@ public class LundiFragment extends Fragment {
             }
 
         }
-
-
-
-
-
 
     }
 
